@@ -519,6 +519,8 @@ double Board::calcSolutionForFinal(char myStone,int& x,int& y){
 	num.push_back(board3.calcSolutionForFinal(myStone,nextX,nextY));
       }
 
+      peerX.clear();
+      peerY.clear();
       num2.push_back(*std::min_element(num.begin(),num.end()));
       num.clear();
       board2 = *this;
@@ -548,6 +550,8 @@ int Board::calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int&
   
   //置くことのできる箇所の数を返す
   if(width==0){
+    //showBoard();
+    //std::cout << getScore(myStone) << std::endl;
     return getScore(myStone);
   }
   
@@ -564,13 +568,20 @@ int Board::calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int&
   if(check!=0){//置けるところがあった場合
     auto i = myX.begin();
     for(auto j = myY.begin();j<myY.end();j++){
+      
+      assert(board2.setFakeStone(myStone,*i,*j)==0);//デバッグ用
+
       board2.setStone(myStone,*i,*j);
       check2 = board2.canSetStones(peerStone,peerX,peerY);
       board3 = board2;
+
       
       if(check2!=0){//置けるところがあった場合
 	auto k = peerX.begin();
 	for(auto l = peerY.begin();l<peerY.end();l++){
+	  
+	  assert(board3.setFakeStone(peerStone,*k,*l)==0);//デバッグ用
+
 	  board3.setStone(peerStone,*k,*l);
 	  num.push_back(board3.calcSolutionForMiddle2(myStone,counter+1,width-1,nextX,nextY));
 	  
@@ -581,6 +592,8 @@ int Board::calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int&
 	num.push_back(board3.calcSolutionForMiddle2(myStone,counter+1,width-1,nextX,nextY));
       }
 
+      peerX.clear();
+      peerY.clear();
       num2.push_back(*std::min_element(num.begin(),num.end()));
       num.clear();
       board2 = *this;
