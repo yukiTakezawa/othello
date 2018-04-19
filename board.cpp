@@ -2,7 +2,7 @@
 
 
 //盤面全てを表示
-void Board::showBoard(){
+void Board::showBoard() const{
   std::cout << " 0 1 2 3 4 5 6 7 " << std::endl;
   
   for(int i=0;i<8;i++){
@@ -252,7 +252,7 @@ int Board::calcScore(char myStone){
 }
 
 //setStoneの実際には石を置かない関数
-int Board::setFakeStone(char myStone,int x,int y){
+int Board::setFakeStone(char myStone,int x,int y) const{
   int flag=0;//最後にflag=0ならばどこもひっくり返していない
   char peerStone;
   if(myStone == 'x'){
@@ -396,82 +396,7 @@ int Board::setFakeStone(char myStone,int x,int y){
   return 0;
 }
 
-//中盤用
-int Board::calcSolutionForMiddle(char myStone,int counter,int width,int& x,int& y){
-  //int Board::checkNextBoard(char myStone,std::vector<int> &x,std::vector<int> &y){
-  int check,check2;
-  //int num=0;
-  Board* board2;
-  char peerStone;
-  int openness=0,openness2=0,minOpenness=INT_MAX,maxOpenness=INT_MIN;
-  int nextX,nextY,testX,testY;
 
-  
-  if(myStone=='x')  peerStone='o';
-  if(myStone=='o')  peerStone='x';
-    
-  //width手数先まで読むので、width+counter>30の時は30手目に修正する
-  if(width+counter>30){
-    width = 30 - counter;
-  }else if(width==0){    
-    return 0;
-  }
-
-  Board* board3;
-  
-  for(int i=0;i<8;i++){
-    for(int j=0;j<8;j++){
-      check = this->setFakeStone(myStone,i,j);//myStoneのおける箇所を探す
-      if(check==-1){
-	continue;
-      }else if(check==0){
-	board2 = new Board();
-	*board2 = *this;
-	openness = board2->setStone(myStone,i,j);
-
-	//角の時の処理
-	if(isCorner(i,j))openness -= 7;
-	
-	openness2 = openness;
-		
-	//peerStoneの番
-	for(int k=0;k<8;k++){
-	  for(int l=0;l<8;l++){
-	    check2 = board2->setFakeStone(peerStone,k,l);//peerStoneのおける箇所を探す
-	    if(check2==-1){
-	      continue;
-	    }else if(check2==0){
- 	      board3 = new Board();
-	      *board3 = *board2;
-	      openness2 -= board3->setStone(peerStone,k,l);
-
-	      //角の時の処理
-	      if(isCorner(k,l)) openness2 += 7;
-	      
-	      openness2 += board3->calcSolutionForMiddle(myStone,counter+1,width-1,testX,testY);//再帰的に
-	      delete board3;
-
-	      if(openness2>maxOpenness){
-		maxOpenness =  openness2;		
-	      }
-	    }
-	    openness2 = openness; 
-	  }
-	}
-	if(maxOpenness<minOpenness){
-	  minOpenness = maxOpenness;
-	  nextX = i;
-	  nextY = j;
-	}
-	maxOpenness = INT_MIN;
-	delete board2;
-      }
-    }
-  }
-  x = nextX;
-  y = nextY;
-  return minOpenness;
-}
 
 //終盤用の
 double Board::calcSolutionForFinal(char myStone,int& x,int& y){
@@ -539,7 +464,7 @@ double Board::calcSolutionForFinal(char myStone,int& x,int& y){
 }
      
 
-int Board::calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int& y){
+int Board::calcSolutionForMiddle(char myStone,int counter,int width,int& x,int& y){
   char peerStone;
   if(myStone=='x') peerStone='o';
   if(myStone=='o') peerStone='x';
@@ -583,13 +508,13 @@ int Board::calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int&
 	  assert(board3.setFakeStone(peerStone,*k,*l)==0);//デバッグ用
 
 	  board3.setStone(peerStone,*k,*l);
-	  num.push_back(board3.calcSolutionForMiddle2(myStone,counter+1,width-1,nextX,nextY));
+	  num.push_back(board3.calcSolutionForMiddle(myStone,counter+1,width-1,nextX,nextY));
 	  
 	  board3 = board2;
 	  k++;
 	}
       }else{//置けるところがなかった場合
-	num.push_back(board3.calcSolutionForMiddle2(myStone,counter+1,width-1,nextX,nextY));
+	num.push_back(board3.calcSolutionForMiddle(myStone,counter+1,width-1,nextX,nextY));
       }
 
       peerX.clear();
@@ -618,7 +543,7 @@ void Board::autoSetStone(char myStone,int counter,int border,int width){
 
   int x,y;
   if(counter<border){
-    calcSolutionForMiddle2(myStone,counter,width,x,y);
+    calcSolutionForMiddle(myStone,counter,width,x,y);
     setStone(myStone,x,y);
   }else{
     fprintf(stderr,"calcSolutionForFinal\n");
@@ -628,7 +553,7 @@ void Board::autoSetStone(char myStone,int counter,int border,int width){
 }
 
 //置く場所があればその数を、なければ0をかえす
-int Board::canSetStones(char myStone){
+int Board::canSetStones(char myStone) const{
   int count=0;
   for(int i=0;i<8;i++){
     for(int j=0;j<8;j++){
@@ -655,7 +580,7 @@ int Board::canSetStones(char myStone,std::vector<int>& x,std::vector<int>& y){
   return count;
 }
 
-int Board::countMyStones(char myStone){
+int Board::countMyStones(char myStone) const{
   int num=0;
   for(int i=0;i<8;i++){
     for(int j=0;j<8;j++){
@@ -665,7 +590,7 @@ int Board::countMyStones(char myStone){
   return num;
 }
 
-bool Board::isCorner(int i,int j){
+bool Board::isCorner(int i,int j) const{
   if(i==0 && j==0) return true;
   if(i==0 && j==7) return true;
   if(i==7 && j==7) return true;
@@ -674,7 +599,7 @@ bool Board::isCorner(int i,int j){
   return false;
 }
 
-bool Board::isEnd(){
+bool Board::isEnd() const{
   int num=0,num2=0,num3=0;
   for(int i=0;i<8;i++){
     for(int j=0;j<8;j++){
@@ -692,22 +617,32 @@ bool Board::isEnd(){
 int Board::getScore(char myStone){
   int score=0;
   static const int CORNER_SCORE=100;
+  static const int PRE_CORNER_SCORE = -80;
   char peerStone;
   if(myStone=='x'){
     peerStone='o';
   }else{
     peerStone='x';
   }
-		     
-  if(board[0][0]==myStone) score += CORNER_SCORE;
-  if(board[0][7]==myStone) score += CORNER_SCORE;
-  if(board[7][7]==myStone) score += CORNER_SCORE;
-  if(board[7][9]==myStone) score += CORNER_SCORE;
-  if(board[0][0]==peerStone) score -= CORNER_SCORE;
-  if(board[0][7]==peerStone) score -= CORNER_SCORE;
-  if(board[7][7]==peerStone) score -= CORNER_SCORE;
-  if(board[7][0]==peerStone) score -= CORNER_SCORE;
 
+  
+  if(board[0][0]==myStone) score += CORNER_SCORE;
+  if(board[0][0]==peerStone) score -= CORNER_SCORE;
+  if(board[0][7]==myStone) score += CORNER_SCORE;
+  if(board[0][7]==peerStone) score -= CORNER_SCORE;
+  if(board[7][7]==myStone) score += CORNER_SCORE;
+  if(board[7][7]==peerStone) score -= CORNER_SCORE;
+  if(board[7][0]==myStone) score += CORNER_SCORE;
+  if(board[7][0]==peerStone) score -= CORNER_SCORE;     
+  if(board[1][1]==myStone) score += PRE_CORNER_SCORE;
+  if(board[1][1]==peerStone) score -= PRE_CORNER_SCORE;
+  if(board[1][6]==myStone) score += PRE_CORNER_SCORE;
+  if(board[1][6]==peerStone) score -= PRE_CORNER_SCORE;
+  if(board[6][6]==myStone) score += PRE_CORNER_SCORE;
+  if(board[6][6]==peerStone) score -= PRE_CORNER_SCORE;
+  if(board[6][1]==myStone) score += PRE_CORNER_SCORE;
+  if(board[6][1]==peerStone) score -= PRE_CORNER_SCORE;
+  
   score = score + canSetStones(myStone) - canSetStones(peerStone);
   return score;
   
@@ -721,7 +656,7 @@ void Board::operator=(const Board b){
   }
 }
 
-char Board::whoWin(){
+char Board::whoWin() const{
   if((countMyStones('x')-countMyStones('o'))>0){
     return 'x';
   }else{

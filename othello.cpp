@@ -12,6 +12,7 @@ int main(){
   int x=0,y=0;
   board.showBoard();
   int counter=0;
+  std::vector<int> nextX,nextY;
   
   while(!board.isEnd()){
     if(board.canSetStones('o')!=0){
@@ -26,22 +27,23 @@ int main(){
 	  std::cout << "you try to set " << x << "," << y <<",but cannot set Stone here" << std::endl;
 	}
       }while(check==-1);
+      board.setStone('o',x,y);
     }else{
       std::cout << "you pass" << std::endl;
     }
 
-    board.setStone('o',x,y);
     board.showBoard();
-          
+    
     x=0;
     y=0;
-
+   
     if(board.canSetStones('x')!=0){
       board.autoSetStone('x',counter);
       board.showBoard();
     }else{
       std::cout << "I pass" << std::endl;
     }
+    
     counter++;
   }
   if(board.whoWin()=='x'){

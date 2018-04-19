@@ -9,6 +9,7 @@
 #include<cstdlib>
 #include<algorithm>
 #include<numeric>
+#include<cassert>
 
 class Board{
   
@@ -29,7 +30,7 @@ public:
   }
   
   //盤面全てを表示
-  void showBoard();
+  void showBoard() const;
 
   //開放度の計算
   int getOpenness(int x,int y);
@@ -41,7 +42,7 @@ public:
   int setStone(char myStone,int x,int y);
 
   //setStoneの実際には石を置かないバージョン
-  int setFakeStone(char myStone,int x,int y);
+  int setFakeStone(char myStone,int x,int y) const;
   
   //盤上の優勢度の点数を計算する
   int calcScore(char myStone);
@@ -50,32 +51,30 @@ public:
   //counterは現在何番目の手順か
   //widthはゲーム木の高さ
   int calcSolutionForMiddle(char myStone,int counter,int width,int& x,int& y);
-
-  int calcSolutionForMiddle2(char myStone,int counter,int width,int& x,int& y);
   
   double calcSolutionForFinal(char myStone,int& x,int& y);
 
-  void autoSetStone(char myStone,int counter,int border=25,int width=2);
+  void autoSetStone(char myStone,int counter,int border=25,int width=3);
   //石の個数を数える
-  int countMyStones(char myStone);
+  int countMyStones(char myStone) const;
 
-  int canSetStones(char myStone);
+  int canSetStones(char myStone) const;
 
   //置く箇所があるならその数を返す
   int canSetStones(char myStone,std::vector<int>& x,std::vector<int>& y);
   
   //board[i][j]が角だったらtrueを返す
-  bool isCorner(int i,int j);
+  bool isCorner(int i,int j) const;
 
   //全ての石を置きおわったらtrueを返す
-  bool isEnd();
+  bool isEnd() const;
   
   void operator=(const Board b);
 
   int getScore(char myStone);
 
   //勝った方の石を返す
-  char whoWin();
+  char whoWin() const;
 };
 
 #endif
