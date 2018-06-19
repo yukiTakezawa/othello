@@ -1,80 +1,70 @@
 #ifndef BOARD_HPP
 #define BOARD_HPP
 
-#include<math.h>
-
-#include<climits>
 #include<iostream>
+#include<bitset>
 #include<vector>
-#include<cstdlib>
-#include<algorithm>
-#include<numeric>
-#include<cassert>
+
 
 class Board{
-  
+
+  std::uint64_t black;//black is 'o'
+  std::uint64_t white;//while is 'x'
 public:
-  char board[8][8];
-  
+  const static std::uint64_t RIGHT;
+  const static std::uint64_t LEFT;
+  const static std::uint64_t UP;
+  const static std::uint64_t DOWN;
+  const static std::uint64_t UPPER_RIGHT;
+  const static std::uint64_t UPPER_LEFT;
+  const static std::uint64_t LOWER_RIGHT;
+  const static std::uint64_t LOWER_LEFT;
+  const static char BLACK;
+  const static char WHITE;
+  const static std::uint64_t DIRECTIONS[8];
+    
   Board(){
-    //盤を初期化する
-    for(int i=0;i<8;i++){
-      for(int j=0;j<8;j++){
-	board[i][j] = ' ';
-      }
-    }
-    board[3][3] = 'x';
-    board[4][4] = 'x';
-    board[3][4] = 'o';
-    board[4][3] = 'o';
+    black = convertBitBoard(3,4) | convertBitBoard(4,3);
+    white = convertBitBoard(3,3) | convertBitBoard(4,4);
   }
+
+  void set(std::uint64_t black2,std::uint64_t white2);
+
+private:
+  std::uint64_t getBlack() const;
+
+  std::uint64_t getWhite() const;
+
+  //(col,row)に置けるなら0、おけないなら-1が返る
+  int setFakeStone(char myStone,int col,int row) const;
+
+  //置く座標(col,row)を64bitに変換する
+  std::uint64_t convertBitBoard(int col,int row) const;
+
+  std::uint64_t transfer(std::uint64_t m,std::uint64_t direction) const;
   
-  //盤面全てを表示
-  void showBoard() const;
+  std::uint64_t getRevPat(char myStone,int col,int row) const;
 
-  //開放度の計算
-  int getOpenness(int x,int y);
+public:
+  //盤面を表示する
+  void show() const;
+
+  void setStone(char myStone,int col,int row);
+
+  void operator=(const Board board);
   
-  //board[x][y]からboard[x2][y2]までをひっくり返す
-  //返り値は開放度の合計
-  int flip(char myStone,int x,int y,int x2,int y2);
-  
-  int setStone(char myStone,int x,int y);
-
-  //setStoneの実際には石を置かないバージョン
-  int setFakeStone(char myStone,int x,int y) const;
-  
-  //盤上の優勢度の点数を計算する
-  int calcScore(char myStone);
-
-  //次に打つべき手を計算しx,yに代入する
-  //counterは現在何番目の手順か
-  //widthはゲーム木の高さ
-  int calcSolutionForMiddle(char myStone,int counter,int width,int& x,int& y);
-  
-  double calcSolutionForFinal(char myStone,int& x,int& y);
-
-  void autoSetStone(char myStone,int counter,int border=25,int width=3);
-  //石の個数を数える
-  int countMyStones(char myStone) const;
-
-  int canSetStones(char myStone) const;
-
   //置く箇所があるならその数を返す
   int canSetStones(char myStone,std::vector<int>& x,std::vector<int>& y);
-  
-  //board[i][j]が角だったらtrueを返す
-  bool isCorner(int i,int j) const;
 
-  //全ての石を置きおわったらtrueを返す
+  //置く箇所があればtrue,なければfalseを返す。
+  bool canSetStones(char myStone) const;
+
+
+  void autoSetStone(char myStone,int counter,int border=25,int width=3);
+
+  int countMyStones(char myStone) const;
+  //勝負が終了したかどうか
   bool isEnd() const;
-  
-  void operator=(const Board b);
-
-  int getScore(char myStone);
-
-  //勝った方の石を返す
-  char whoWin() const;
 };
 
 #endif

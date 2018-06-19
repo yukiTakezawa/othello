@@ -10,7 +10,7 @@ int main(){
   Board board;
   int check;
   int x=0,y=0;
-  board.showBoard();
+  board.show();
   int counter=0;
   std::vector<int> nextX,nextY;
   
@@ -32,14 +32,14 @@ int main(){
       std::cout << "you pass" << std::endl;
     }
 
-    board.showBoard();
+    board.show();
     
     x=0;
     y=0;
    
     if(board.canSetStones('x')!=0){
       board.autoSetStone('x',counter);
-      board.showBoard();
+      board.show();
     }else{
       std::cout << "I pass" << std::endl;
     }
